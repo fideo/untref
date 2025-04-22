@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
+import 'package:share_plus/share_plus.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -116,10 +118,15 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
               children: [
-                ElevatedButton.icon(
+                /*ElevatedButton.icon(
                   onPressed: _exportToExcel,
                   icon: Icon(Icons.download),
                   label: Text('Exportar a Excel'),
+                ),*/
+                ElevatedButton.icon(
+                  onPressed: _exportAndShareExcel,
+                  icon: Icon(Icons.share),
+                  label: Text('Exportar y Compartir'),
                 ),
               ],
             ),
@@ -188,5 +195,39 @@ class _HomeScreenState extends State<HomeScreen> {
     final millis = (d.inMilliseconds.remainder(1000) ~/ 10).toString().padLeft(2, '0');
     return '$minutes:$seconds.$millis';
   }
+
+  // Exportar Share Plus
+  Future<void> _exportAndShareExcel() async {
+    final status = await Permission.storage.request();
+    if (!status.isGranted) {
+      return;
+    }
+
+    var excel = Excel.createExcel();
+    Sheet sheet = excel['Nadadores'];
+
+    sheet.appendRow(['Nombre', 'Andarivel', ..._maxSplitsHeader()]);
+    for (var swimmer in swimmers) {
+      List<String> row = [
+        swimmer.name,
+        swimmer.lane.toString(),
+        ...swimmer.splits.map((d) => _formatDuration(d)),
+      ];
+      sheet.appendRow(row);
+    }
+
+    final directory = await getTemporaryDirectory(); // usamos temporal para facilitar compartir
+    String outputPath = '${directory.path}/nadadores.xlsx';
+    File file = File(outputPath)
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(excel.encode()!);
+
+    // Compartimos
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      text: 'Resultados de los nadadores 🏊',
+    );
+  }
+
 
 }
