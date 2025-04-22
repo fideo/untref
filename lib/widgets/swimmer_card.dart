@@ -22,25 +22,31 @@ class _SwimmerCardState extends State<SwimmerCard> {
   @override
   void initState() {
     super.initState();
-    currentTime = Duration.zero;
+    currentTime = widget.swimmer.isRunning ? widget.stopwatchManager.current : widget.swimmer.elapsed;
     widget.stopwatchManager.timeStream.listen((elapsed) {
-      if (widget.swimmer.isRunning) {
-        setState(() {
+      setState(() {
+        if (widget.swimmer.isRunning) {
           currentTime = elapsed;
-        });
-      }
+        } else if (elapsed == Duration.zero) {
+          // Mostrar cero cuando el cronómetro fue reseteado
+          currentTime = widget.swimmer.elapsed;
+        }
+      });
     });
   }
 
   void takeSplit() {
     setState(() {
-      widget.swimmer.splits.add(currentTime);
+      final time = widget.swimmer.isRunning
+          ? widget.stopwatchManager.current
+          : widget.swimmer.elapsed;
+      widget.swimmer.splits.add(time);
     });
   }
 
   void stop() {
     setState(() {
-      widget.swimmer.elapsed = currentTime;
+      widget.swimmer.elapsed = widget.stopwatchManager.current;
       widget.swimmer.isRunning = false;
     });
   }
