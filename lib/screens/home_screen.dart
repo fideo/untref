@@ -14,6 +14,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final StopwatchManager stopwatchManager = StopwatchManager();
   final List<Swimmer> swimmers = [];
 
+  void _resetAll() {
+    stopwatchManager.reset();
+    setState(() {
+      for (var s in swimmers) {
+        s.reset();
+      }
+    });
+  }
+
   void addSwimmer(String name, int lane) {
     setState(() {
       swimmers.add(Swimmer(name: name, lane: lane));
@@ -93,6 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(child: ElevatedButton(onPressed: _startAll, child: Text('Iniciar Todos'))),
                 SizedBox(width: 8),
                 Expanded(child: ElevatedButton(onPressed: _stopAll, child: Text('Detener Todos'))),
+                SizedBox(width: 8),
+                Expanded(child: ElevatedButton(onPressed: _resetAll, child: Text('Resetear Todos'))),
               ],
             ),
           ),
