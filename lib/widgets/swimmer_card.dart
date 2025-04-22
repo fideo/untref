@@ -55,9 +55,9 @@ class _SwimmerCardState extends State<SwimmerCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: ListTile(
+      child: ExpansionTile(
         title: Text('${widget.swimmer.name} (Andarivel ${widget.swimmer.lane})'),
-        subtitle: Text('Tiempo: ${_formatDuration(currentTime)}'),
+        subtitle: Text('Tiempo actual: ${_formatDuration(currentTime)}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -65,6 +65,16 @@ class _SwimmerCardState extends State<SwimmerCard> {
             IconButton(icon: Icon(Icons.stop), onPressed: stop),
           ],
         ),
+        children: widget.swimmer.splits.isNotEmpty
+            ? widget.swimmer.splits
+            .asMap()
+            .entries
+            .map((entry) => ListTile(
+          dense: true,
+          title: Text('Parcial ${entry.key + 1}: ${_formatDuration(entry.value)}'),
+        ))
+            .toList()
+            : [Padding(padding: EdgeInsets.all(8), child: Text('Sin parciales'))],
       ),
     );
   }
