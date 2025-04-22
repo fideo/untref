@@ -3,6 +3,11 @@ import '../models/swimmer.dart';
 import '../utils/stopwatch_manager.dart';
 import '../widgets/swimmer_card.dart';
 
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -107,6 +112,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _exportToExcel,
+                  icon: Icon(Icons.download),
+                  label: Text('Exportar a Excel'),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: swimmers.length,
@@ -122,4 +139,54 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  // Exportar a Excel
+  Future<void> _exportToExcel() async {
+    final status = await Permission.storage.request();
+    if (!status.isGranted) {
+      return;
+    }
+
+    var excel = Excel.createExcel();
+    Sheet sheet = excel['Nadadores'];
+
+    // Primera fila con encabezados
+    sheet.appendRow(['Nombre', 'Andarivel', ..._maxSplitsHeader()]);
+
+    // Agregar los datos
+    for (var swimmer in swimmers) {
+      List<String> row = [
+        swimmer.name,
+        swimmer.lane.toString(),
+        ...swimmer.splits.map((d) => _formatDuration(d)),
+      ];
+      sheet.appendRow(row);
+    }
+
+    // Obtener ruta y guardar archivo
+    final directory = await getExternalStorageDirectory();
+    String outputPath = '${directory!.path}/nadadores.xlsx';
+    File(outputPath)
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(excel.encode()!);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Archivo guardado en: $outputPath')),
+    );
+  }
+
+// Helper: calcula los encabezados para la cantidad máxima de parciales
+  List<String> _maxSplitsHeader() {
+    final maxSplits = swimmers.map((s) => s.splits.length).fold<int>(0, (a, b) => a > b ? a : b);
+    return List.generate(maxSplits, (i) => 'Pasada ${i + 1}');
+  }
+
+// Ya tenés esto en swimmer_card.dart, pero lo copiamos acá también
+  String _formatDuration(Duration d) {
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final millis = (d.inMilliseconds.remainder(1000) ~/ 10).toString().padLeft(2, '0');
+    return '$minutes:$seconds.$millis';
+  }
+
 }
