@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    ndkVersion = "27.0.12077973"
     namespace = "com.example.untref"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -37,6 +38,23 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    flavorDimensions += "api"
+
+    productFlavors {
+        create("api30") {
+            dimension = "api"
+            minSdk = 30
+            targetSdk = 30
+        }
+
+        create("api34") {
+            dimension = "api"
+            minSdk = 34
+            targetSdk = 34
+        }
+    }
+
 }
 
 flutter {

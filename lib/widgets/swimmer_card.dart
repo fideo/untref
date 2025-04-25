@@ -56,7 +56,7 @@ class _SwimmerCardState extends State<SwimmerCard> {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ExpansionTile(
-        title: Text('${widget.swimmer.name} (Andarivel ${widget.swimmer.lane})'),
+        title: Text('${widget.swimmer.name} (Andarivel ${widget.swimmer.lane}) - Parciales: ${widget.swimmer.splits.length}',),
         subtitle: Text('Tiempo actual: ${_formatDuration(currentTime)}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
