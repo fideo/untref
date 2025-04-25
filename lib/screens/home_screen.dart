@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Swim Timer')),
+      appBar: AppBar(title: Text('UNTREF Natación')),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         child: Icon(Icons.add),
