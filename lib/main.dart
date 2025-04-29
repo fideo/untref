@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'package:untref/screens/session_list_screen.dart';
 
 void main() {
   runApp(const UntrefApp());
@@ -13,7 +14,8 @@ class UntrefApp extends StatelessWidget {
     return MaterialApp(
       title: 'UNTREF Natación',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-      home: const HomeScreen(),
+      //home: const HomeScreen(),
+      home: const SessionListScreen(),
     );
   }
 }
